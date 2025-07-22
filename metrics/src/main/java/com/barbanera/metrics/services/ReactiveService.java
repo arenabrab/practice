@@ -24,7 +24,8 @@ public class ReactiveService {
     public Mono<ReactiveMetric> save(ServerRequest request) {
         return request.bodyToMono(MetricDto.class)
                 .map(MetricDto::toReactiveMetric)
-                .flatMap(metricsPostgresReactiveRepository::save);
+                .flatMap(metricsPostgresReactiveRepository::save)
+                .doOnNext(metric -> log.info("Saving metric: {}", metric));
     }
 
     public Mono<Void> delete(ServerRequest request) {

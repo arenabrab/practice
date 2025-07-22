@@ -3,6 +3,10 @@ on:
     paths:
       - 'metrics/**'
 
+permissions:
+  contents: write
+  packages: write
+
 env:
   CI_REGISTRY_USER: ${{ github.actor }}
   LOCAL_DEV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -10,10 +14,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      packages: write
 
     steps:
       - name: checkout code

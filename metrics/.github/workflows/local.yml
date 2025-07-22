@@ -1,5 +1,5 @@
 name: local.yml
-on: [push]
+on: workflow_call
 
 jobs:
   build:

@@ -1,0 +1,9 @@
+name: workflow.yml
+on:
+  push:
+    paths:
+      - 'metrics/**'
+
+jobs:
+  run-metrics:
+    uses: ./metrics/.github/workflows/local.yml

@@ -6,4 +6,4 @@ on:
 
 jobs:
   run-metrics:
-    uses: metrics/.github/workflows/local.yml
+    uses: ./.github/actions/local.yml

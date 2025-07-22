@@ -1,5 +1,7 @@
-name: metrics.yml
-on: workflow_call
+on:
+  push:
+    paths:
+      - 'metrics/**'
 
 jobs:
   build:
@@ -16,10 +18,13 @@ jobs:
           java-version: '24'
 
       - name: chmod gradle
+        working-directory: ./metrics
         run: chmod +x gradlew
 
       - name: bootBuildImage
+        working-directory: ./metrics
         run: ./gradlew bBI
 
       - name: test
+        working-directory: ./metrics
         run: ./gradlew check

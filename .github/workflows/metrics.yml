@@ -7,6 +7,7 @@ permissions:
   contents: write
   packages: write
 
+
 env:
   CI_REGISTRY_USER: ${{ github.actor }}
   LOCAL_DEV_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -16,6 +16,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -26,9 +31,9 @@ jobs:
           distribution: 'temurin'
           java-version: '24'
 
-      - name: chmod gradle
-        working-directory: ./metrics
-        run: chmod +x gradlew
+#      - name: chmod gradle
+#        working-directory: ./metrics
+#        run: chmod +x gradlew
 
       - name: 💾 Cache Gradle
         uses: actions/cache@v3

@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: metrics-app
+  name: metrics
   labels:
-    app: metrics-app
+    app: metrics
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: metrics-app
+      app: metrics
   template:
     metadata:
       labels:
-        app: metrics-app
+        app: metrics
     spec:
       containers:
         - name: metrics-container

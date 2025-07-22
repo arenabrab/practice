@@ -3,6 +3,10 @@ on:
     paths:
       - 'metrics/**'
 
+env:
+  CI_REGISTRY_USER: ${{ github.actor }}
+  LOCAL_DEV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest

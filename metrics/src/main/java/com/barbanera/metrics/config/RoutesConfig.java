@@ -26,6 +26,6 @@ public class RoutesConfig {
                                 .PUT( req -> ServerResponse.ok().body(reactiveService.update(req), ReactiveMetric.class))
                                 .DELETE( req -> ServerResponse.ok().body(reactiveService.delete(req), Void.class)))
                                 .build())
-                .andRoute(RequestPredicates.GET("/foobar"), request -> ServerResponse.noContent().build());
+                .andRoute(RequestPredicates.GET("/foo"), request -> ServerResponse.noContent().build());
     }
 }

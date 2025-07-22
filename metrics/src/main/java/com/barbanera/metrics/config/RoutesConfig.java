@@ -25,6 +25,7 @@ public class RoutesConfig {
                                 .POST( req -> ServerResponse.created(URI.create("metrics/reactive")).body(reactiveService.save(req), ReactiveMetric.class))
                                 .PUT( req -> ServerResponse.ok().body(reactiveService.update(req), ReactiveMetric.class))
                                 .DELETE( req -> ServerResponse.ok().body(reactiveService.delete(req), Void.class)))
+                                .GET("foo", request -> ServerResponse.noContent().build())
                                 .build());
     }
 }

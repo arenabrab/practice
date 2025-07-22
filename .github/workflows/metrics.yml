@@ -1,0 +1,25 @@
+name: metrics.yml
+on: workflow_call
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: set up jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: chmod gradle
+        run: chmod +x gradlew
+
+      - name: bootBuildImage
+        run: ./gradlew bBI
+
+      - name: test
+        run: ./gradlew check

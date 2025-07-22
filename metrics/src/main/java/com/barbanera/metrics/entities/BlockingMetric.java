@@ -9,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
-
 @Entity
 @Data
 @Builder(toBuilder = true)
@@ -27,7 +25,7 @@ public class BlockingMetric {
     @Version
     private Long version = 1L;
     @CreatedDate
-    private Instant createdDate;
+    private Long createdDate;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private Long lastModifiedDate;
 }

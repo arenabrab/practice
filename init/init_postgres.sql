@@ -1,6 +1,6 @@
 -- CREATE DATABASE practice;
 
-CREATE TABLE blockingMetric (
+CREATE TABLE metric (
     id SERIAL PRIMARY KEY,
     type VARCHAR(255) NOT NULL,
     payload JSONB NOT NULL,

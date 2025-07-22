@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 //	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 	implementation 'org.springframework.kafka:spring-kafka'
 
@@ -64,4 +65,15 @@ generateJava {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named("bootBuildImage") {
+	imageName = 'ghcr.io/arenabrab/practice:metrics-0.0.1-SNAPSHOT'
+	publish = true
+	docker {
+		publishRegistry {
+			username = System.getenv('CI_REGISTRY_USER')
+			password = System.getenv('LOCAL_DEV_TOKEN')
+		}
+	}
 }

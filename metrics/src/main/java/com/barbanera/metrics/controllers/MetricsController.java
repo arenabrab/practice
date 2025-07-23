@@ -36,4 +36,5 @@ public class MetricsController {
     public void deleteMetric(@PathVariable("id") long id) {
         blockingService.deleteMetric(id);
     }
+
 }

@@ -42,11 +42,10 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
 
-
       - name: bootBuildImage
         working-directory: ./metrics
         run: ./gradlew bBI
 
       - name: test
         working-directory: ./metrics
-        run: ./gradlew check
+        run: ./gradlew test

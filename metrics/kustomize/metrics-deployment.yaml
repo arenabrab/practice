@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: metrics-container
-          image: ghcr.io/arenabrab/practice@sha256:abc123... # {"$imagepolicy": "flux-system:metrics-image-policy"}
+          image: ghcr.io/arenabrab/practice@sha256:abc123...
+          # {"$imagepolicy": "flux-system:metrics-image-policy"}
 
           ports:
             - containerPort: 8080

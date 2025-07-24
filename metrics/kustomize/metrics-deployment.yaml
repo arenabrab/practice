@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: metrics-container
-          image: ghcr.io/arenabrab/practice:metrics-0.0.1-SNAPSHOT
+          image: ghcr.io/arenabrab/practice@sha256:abc123exampledigest
           ports:
             - containerPort: 8080
           env:

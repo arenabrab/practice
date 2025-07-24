@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: practice
+    name: metrics
   policy:
     semver:
       range: 'metrics-0.0.1-SNAPSHOT'

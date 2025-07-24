@@ -7,6 +7,10 @@ metadata:
 spec:
   imageRepositoryRef:
     name: practice
+  filterTags:
+    pattern: '^metrics-(\d+\.\d+\.\d+)(-SNAPSHOT)?$'
+    extract: '$1'
   policy:
     semver:
-      range: 1.x
+      range: 0.x
+

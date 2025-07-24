@@ -9,4 +9,4 @@ spec:
     name: practice
   policy:
     semver:
-      range: 'metrics-0.0.1-SNAPSHOT'
+      range: 1.x

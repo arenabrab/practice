@@ -8,9 +8,10 @@ spec:
   imageRepositoryRef:
     name: practice
   filterTags:
-    pattern: '^metrics-(\d+\.\d+\.\d+)(-SNAPSHOT)?$'
+    pattern: '^metrics-(\d+\.\d+\.\d+)(-snapshot)?$'
     extract: '$1'
   policy:
     semver:
-      range: 0.0.1
+      range: '>=0.0.1'
+
 

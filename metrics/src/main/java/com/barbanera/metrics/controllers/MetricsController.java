@@ -4,6 +4,7 @@ import com.barbanera.metrics.dtos.MetricDto;
 import com.barbanera.metrics.entities.BlockingMetric;
 import com.barbanera.metrics.services.BlockingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class MetricsController {
     @ResponseStatus(code = org.springframework.http.HttpStatus.NO_CONTENT)
     public void deleteMetric(@PathVariable("id") long id) {
         blockingService.deleteMetric(id);
+    }
+
+    @GetMapping("/foo")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void foo() {
     }
 
 }

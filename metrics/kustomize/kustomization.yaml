@@ -2,6 +2,3 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - metrics-deployment.yaml
-images:
-  - name: ghcr.io/arenabrab/practice
-    newDigest: sha256:0000000000000000000000000000000000000000000000000000000000000000

@@ -95,7 +95,8 @@ jobs:
           gradle-version: wrapper
 
       - name: Make gradlew executable
-        run: chmod +x ./gradlew
+        working-directory: ./metrics
+        run: chmod +x gradlew
 
       - name: Run tests
         run: ./gradlew clean test

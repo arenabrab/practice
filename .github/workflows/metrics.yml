@@ -69,13 +69,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: your-dockerhub-username/my-spring-app
+  IMAGE_NAME: barbanera/practice
 
 jobs:
   test:
@@ -168,13 +168,13 @@ jobs:
       - name: Checkout GitOps repo
         uses: actions/checkout@v4
         with:
-          repository: your-username/my-spring-app-gitops
+          repository: arenabrab/practice-gitops
           token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
 
       - name: Update image tag
         run: |
-          cd gitops/clusters/local/apps/my-spring-app
+          cd gitops/clusters/local/apps/metrics
           # Extract just the tag from the full image reference
           NEW_TAG=$(echo "${{ needs.build-and-push.outputs.image-tag }}" | grep -o 'main-[a-f0-9]\{7\}' || echo "latest")
           sed -i "s/newTag:.*/newTag: ${NEW_TAG}/" kustomization.yaml

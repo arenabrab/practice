@@ -99,6 +99,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests
+        working-directory: ./metrics
         run: ./gradlew clean test
 
   build-and-push:
@@ -124,9 +125,11 @@ jobs:
           gradle-version: wrapper
 
       - name: Make gradlew executable
+        working-directory: ./metrics
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
+        working-directory: ./metrics
         run: ./gradlew clean build -x test
 
       - name: Set up Docker Buildx

@@ -17,6 +17,7 @@ public class BlockingService {
     private final MetricsPostgresRepository metricsPostgresRepository;
 
     public List<BlockingMetric> getMetrics() {
+        log.info("Finding all blocking metrics");
         return metricsPostgresRepository.findAll();
     }
 

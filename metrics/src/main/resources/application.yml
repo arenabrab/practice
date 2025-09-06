@@ -3,12 +3,10 @@ spring:
     name: metrics
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    password: SecurePassword
-    username: pg_user
+    password: password
   jpa:
     hibernate:
       ddl-auto: create-drop
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/postgres
-    password: SecurePassword
-    username: pg_user
+    url: r2dbc:postgresql://pg_user:SecurePassword@localhost:5432/postgres
+    password: password

@@ -68,12 +68,26 @@ tasks.named('test') {
 }
 
 tasks.named("bootBuildImage") {
-	imageName = 'ghcr.io/arenabrab/practice:metrics-0.0.1-SNAPSHOT'
-	publish = true
-	docker {
-		publishRegistry {
-			username = System.getenv('CI_REGISTRY_USER')
-			password = System.getenv('LOCAL_DEV_TOKEN')
-		}
-	}
+//	imageName = 'ghcr.io/arenabrab/practice:metrics-0.0.1-SNAPSHOT'
+//	publish = true
+
+    builder = "paketobuildpacks/builder-jammy-tiny:latest"
+
+    environment = [
+            "BPL_JVM_THREAD_COUNT": "50",
+            "BP_JVM_VERSION": "24",
+            "BPL_SPRING_CLOUD_BINDINGS_DISABLED": "true",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "-Ob"
+    ]
+
+    buildArgs = [
+            "BP_JVM_JLINK_ENABLED": "true"
+    ]
+
+//	docker {
+//		publishRegistry {
+//			username = System.getenv('CI_REGISTRY_USER')
+//			password = System.getenv('LOCAL_DEV_TOKEN')
+//		}
+//	}
 }

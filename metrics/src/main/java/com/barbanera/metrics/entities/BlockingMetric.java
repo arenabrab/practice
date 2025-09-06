@@ -23,6 +23,7 @@ public class BlockingMetric {
     private String type;
     private String payload;
     @Version
+    @Builder.Default
     private Long version = 1L;
     @CreatedDate
     private Long createdDate;

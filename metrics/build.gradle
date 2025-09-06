@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.netflix.dgs.codegen' version '8.1.1'
+//	id 'com.netflix.dgs.codegen' version '8.1.1'
 	id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
@@ -57,11 +57,11 @@ dependencies {
 	testImplementation 'org.testcontainers:r2dbc'
 }
 
-generateJava {
-	schemaPaths = ["${projectDir}/src/main/resources/graphql-client"]
-	packageName = 'com.barbanera.metrics.codegen'
-	generateClient = true
-}
+//generateJava {
+//	schemaPaths = ["${projectDir}/src/main/resources/graphql-client"]
+//	packageName = 'com.barbanera.metrics.codegen'
+//	generateClient = true
+//}
 
 tasks.named('test') {
 	useJUnitPlatform()
@@ -77,10 +77,7 @@ tasks.named("bootBuildImage") {
             "BPL_JVM_THREAD_COUNT": "50",
             "BP_JVM_VERSION": "24",
             "BPL_SPRING_CLOUD_BINDINGS_DISABLED": "true",
-            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "-Ob"
-    ]
-
-    buildArgs = [
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "-Ob",
             "BP_JVM_JLINK_ENABLED": "true"
     ]
 

@@ -4,7 +4,7 @@ metadata:
   name: metrics
   namespace: default
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: metrics
@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
         - name: metrics
-          image: metrics:latest  # This will be updated by CI/CD
+          image: practice:latest  # This will be updated by CI/CD
           ports:
             - containerPort: 8080
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "k8s"
+#          env:
+#            - name: SPRING_PROFILES_ACTIVE
+#              value: "k8s"
           resources:
             limits:
               memory: "512Mi"

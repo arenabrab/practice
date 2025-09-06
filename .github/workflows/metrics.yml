@@ -206,7 +206,8 @@ jobs:
         run: |
           cd gitops/clusters/local/apps/metrics
           # Extract just the tag from the full image reference
-          NEW_TAG=$(echo "${{ needs.build-and-push.outputs.image-tag }}" | grep -o 'main-[a-f0-9]\{7\}' || echo "latest")
+          echo "${{ needs.build-and-push.outputs.image-tag }}
+          NEW_TAG=$(echo "${{ needs.build-and-push.outputs.image-tag }}" | grep -o 'master-[a-f0-9]\{7\}' || echo "latest")
           sed -i "s/newTag:.*/newTag: ${NEW_TAG}/" kustomization.yaml
 
       - name: Commit and push changes

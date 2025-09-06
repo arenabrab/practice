@@ -161,16 +161,16 @@ jobs:
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "full-image=${IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
-#      - name: Build and push with bootBuildImage
-#        working-directory: ./metrics
-#        run: |
-#          ./gradlew bootBuildImage \
-#            --imageName=${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} \
-#            --publishImage
-#        env:
-#          # Pass Docker registry credentials to the build process
-#          DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-#          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push with bootBuildImage
+        working-directory: ./metrics
+        run: |
+          ./gradlew bootBuildImage \
+            --imageName=${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} \
+            --publishImage
+        env:
+          # Pass Docker registry credentials to the build process
+          DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Tag and push latest
         if: github.ref == 'refs/heads/master'

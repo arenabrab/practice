@@ -74,7 +74,6 @@ tasks.named("bootBuildImage") {
     builder = "paketobuildpacks/builder-jammy-tiny:latest"
 
     environment = [
-            "BPL_JVM_THREAD_COUNT": "50",
             "BP_JVM_VERSION": "24",
             "BPL_SPRING_CLOUD_BINDINGS_DISABLED": "true",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "-Ob",

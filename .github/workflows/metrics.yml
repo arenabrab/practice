@@ -64,7 +64,7 @@ jobs:
         with:
           gradle-version: wrapper
           cache-read-only: false
-          gradle-home-cache-cleanup: true
+#          gradle-home-cache-cleanup: true
 
       # Cache native image compilation artifacts
       - name: Cache GraalVM native image artifacts
@@ -118,10 +118,11 @@ jobs:
         working-directory: ./metrics
         run: |
           # Pre-configure JVM options for optimal native compilation
-          export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx10g -XX:+UseStringDeduplication"
+          export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx5g -XX:+UseStringDeduplication"
           
           # Run native compilation with optimized settings
-          ./gradlew nativeCompile --no-configuration-cache \
+          ./gradlew nativeCompile \
+#            --no-configuration-cache \
             --no-daemon \
             --parallel \
             --build-cache \
@@ -137,7 +138,7 @@ jobs:
             -J-XX:+UseG1GC
             -H:+ReportExceptionStackTraces
             --enable-preview
-            --parallelism=4
+            --parallelism=3
             -H:+AllowVMInspection
             -H:+UnlockExperimentalVMOptions
             -H:+UseCompressedOops

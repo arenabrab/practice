@@ -2,6 +2,8 @@ package com.barbanera.metrics.dtos;
 
 import com.barbanera.metrics.entities.BlockingMetric;
 import com.barbanera.metrics.entities.ReactiveMetric;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.SneakyThrows;
 
 public record MetricDto(
         Long id,
@@ -9,11 +11,14 @@ public record MetricDto(
         String payload,
         long version) {
 
+    private static final JsonMapper mapper = JsonMapper.builder().build();
+
+    @SneakyThrows
     public BlockingMetric toBlockingMetric() {
         return BlockingMetric.builder()
                 .id(this.id)
                 .type(this.type)
-                .payload(this.payload)
+                .payload(mapper.writeValueAsString(this.payload))
                 .build();
     }
 

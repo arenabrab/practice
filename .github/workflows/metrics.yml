@@ -26,6 +26,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
+          cache-read-only: false
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -33,15 +34,13 @@ jobs:
 
       - name: Run tests
         working-directory: ./metrics
-        run: ./gradlew clean test
+        run: ./gradlew test
 
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     outputs:
       image-tag: ${{ steps.image-tag.outputs.tag }}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -55,6 +54,17 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
+          cache-read-only: false
+
+#      - name: Cache Gradle dependencies
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            ~/.gradle/caches
+#            ~/.gradle/wrapper
+#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#          restore-keys: |
+#            ${{ runner.os }}-gradle-
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -74,21 +84,43 @@ jobs:
           IMAGE_TAG="${BRANCH_NAME}-${SHORT_SHA}"
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key:  ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/build.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-flags: --debug
+          driver-opts: |
+            network=host
+
       - name: Build and push with bootBuildImage
         working-directory: ./metrics
         run: |
-          ./gradlew bootBuildImage \
+          ./gradlew bootBuildImage -x test \
             --imageName=${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} \
             --publishImage
         env:
           DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_BUILDKIT: 1
+          # Buildpack optimizations
+          BP_JVM_VERSION: "24"
+          BPL_JVM_HEAD_ROOM: "5"
+          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel"
 
       - name: Tag and push latest
         if: github.ref == 'refs/heads/master'
         run: |
           docker tag ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:latest
+
+
 
   update-gitops:
     needs: build-and-push
@@ -115,7 +147,7 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
           git add .
-          git commit -m "Update image tag to ${NEW_TAG}" || exit 0
+          git commit -m "Update image tag to ${{ needs.build-and-push.outputs.image-tag }}" || exit 0
           git push
         env:
           NEW_TAG: ${{ needs.build-and-push.outputs.image-tag }}

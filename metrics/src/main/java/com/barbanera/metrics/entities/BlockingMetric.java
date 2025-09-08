@@ -23,7 +23,7 @@ import java.time.Instant;
 public class BlockingMetric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String type;
     @JdbcTypeCode(value = SqlTypes.JSON)
     private String payload;

@@ -123,7 +123,7 @@ jobs:
           export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx10g -XX:+UseStringDeduplication"
           
           # Run native compilation with optimized settings
-          ./gradlew nativeCompile \
+          ./gradlew nativeCompile --no-configuration-cache \
             --no-daemon \
             --parallel \
             --build-cache \

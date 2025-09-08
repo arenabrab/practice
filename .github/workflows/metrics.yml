@@ -119,7 +119,12 @@ jobs:
           # Buildpack optimizations
           BP_JVM_VERSION: "24"
           BPL_JVM_HEAD_ROOM: "5"
-          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel"
+          BP_NATIVE_IMAGE: "true"
+          BP_NATIVE_IMAGE_BUILD_ARGUMENTS: "--no-fallback -J-Xmx8g -H:+ReportExceptionStackTraces --enable-preview --parallelism=3 --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter"
+          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel -Pspring.aot.enabled=true"
+          # Better memory settings for 14GB runner
+          MAVEN_OPTS: "-Xmx8g"
+          GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=1g"
 
       - name: Tag and push latest
         if: github.ref == 'refs/heads/master'

@@ -51,12 +51,11 @@ jobs:
           sudo mkswap /swapfile
           sudo swapon /swapfile
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
         with:
           java-version: '24'
-          distribution: 'graalvm'
-          native-image-job-reports: 'true'
+          distribution: 'temurin'
           cache: 'gradle'
 
       - name: Setup Gradle with enhanced caching
@@ -114,46 +113,45 @@ jobs:
             network=host
 
       # Optimized Native Compile with better configuration
-      - name: Native Compile (Optimized)
-        working-directory: ./metrics
-        run: |
-          # Pre-configure JVM options for optimal native compilation
-          export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx5g -XX:+UseStringDeduplication"
-          
-          # Run native compilation with optimized settings
-          ./gradlew nativeCompile \
-            --no-daemon \
-            --parallel \
-            --build-cache \
-            -Pspring.aot.enabled=true \
-            -Dorg.gradle.jvmargs="-Xmx10g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC"
-        env:
-          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC -Dorg.gradle.daemon=false"
-          # Native image specific optimizations
-          NATIVE_IMAGE_OPTS: >-
-            --no-fallback
-            -J-Xmx5g
-            -J-XX:+UseG1GC
-            -H:+ReportExceptionStackTraces
-            --enable-preview
-            --parallelism=3
-            -H:+AllowVMInspection
-            -H:+UnlockExperimentalVMOptions
-            -H:+UseCompressedOops
-            -H:+UseCGroupMemoryLimitForHeap
-            -H:ConfigurationFileDirectories=src/main/resources/META-INF/native-image/
-            --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j
-            --initialize-at-build-time=org.springframework
-            -H:ReflectionConfigurationFiles=reflect-config.json
-            -H:ResourceConfigurationFiles=resource-config.json
-            --trace-class-initialization=org.springframework
+#      - name: Native Compile (Optimized)
+#        working-directory: ./metrics
+#        run: |
+#          # Pre-configure JVM options for optimal native compilation
+#          export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx5g -XX:+UseStringDeduplication"
+#
+#          # Run native compilation with optimized settings
+#          ./gradlew nativeCompile \
+#            --no-daemon \
+#            --parallel \
+#            --build-cache \
+#            -Pspring.aot.enabled=true \
+#            -Dorg.gradle.jvmargs="-Xmx10g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC"
+#        env:
+#          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC -Dorg.gradle.daemon=false"
+#          # Native image specific optimizations
+#          NATIVE_IMAGE_OPTS: >-
+#            --no-fallback
+#            -J-Xmx5g
+#            -J-XX:+UseG1GC
+#            -H:+ReportExceptionStackTraces
+#            --enable-preview
+#            --parallelism=3
+#            -H:+AllowVMInspection
+#            -H:+UnlockExperimentalVMOptions
+#            -H:+UseCompressedOops
+#            -H:+UseCGroupMemoryLimitForHeap
+#            -H:ConfigurationFileDirectories=src/main/resources/META-INF/native-image/
+#            --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j
+#            --initialize-at-build-time=org.springframework
+#            -H:ReflectionConfigurationFiles=reflect-config.json
+#            -H:ResourceConfigurationFiles=resource-config.json
+#            --trace-class-initialization=org.springframework
 
       - name: Build and push with bootBuildImage (Skip native compile)
         working-directory: ./metrics
         run: |
           ./gradlew bootBuildImage \
             -x test \
-            -x nativeCompile \
             --no-daemon \
             --parallel \
             --build-cache \
@@ -162,15 +160,15 @@ jobs:
         env:
           DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKER_BUILDKIT: 1
-          # Optimized buildpack configuration
-          BP_JVM_VERSION: "24"
-          BPL_JVM_HEAD_ROOM: "10"
-          BP_NATIVE_IMAGE: "true"
-          BP_NATIVE_IMAGE_BUILD_ARGUMENTS: "--no-fallback -J-Xmx5g -J-XX:+UseG1GC -H:+ReportExceptionStackTraces --enable-preview --parallelism=3 -H:+AllowVMInspection -H:+UnlockExperimentalVMOptions --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j --initialize-at-build-time=org.springframework"
-          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel --build-cache --configuration-cache -Pspring.aot.enabled=true"
-          MAVEN_OPTS: "-Xmx5g"
-          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC"
+#          DOCKER_BUILDKIT: 1
+#          # Optimized buildpack configuration
+#          BP_JVM_VERSION: "24"
+#          BPL_JVM_HEAD_ROOM: "10"
+#          BP_NATIVE_IMAGE: "true"
+#          BP_NATIVE_IMAGE_BUILD_ARGUMENTS: "--no-fallback -J-Xmx5g -J-XX:+UseG1GC -H:+ReportExceptionStackTraces --enable-preview --parallelism=3 -H:+AllowVMInspection -H:+UnlockExperimentalVMOptions --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j --initialize-at-build-time=org.springframework"
+#          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel --build-cache --configuration-cache -Pspring.aot.enabled=true"
+#          MAVEN_OPTS: "-Xmx5g"
+#          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC"
 
       - name: Tag and push latest
         if: github.ref == 'refs/heads/master'

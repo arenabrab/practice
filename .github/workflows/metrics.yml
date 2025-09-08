@@ -26,7 +26,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
-          cache-read-only: false  # Added this for better caching
+          cache-read-only: false
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -34,7 +34,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./metrics
-        run: ./gradlew test  # Removed 'clean' - unnecessary and slows down
+        run: ./gradlew test
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -46,24 +46,41 @@ jobs:
 
       - name: Configure swap space
         run: |
-          sudo fallocate -l 4G /swapfile
+          sudo fallocate -l 2G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
 
-      - name: Set up JDK 24
+      - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: '24'
           distribution: 'graalvm'
+          components: 'native-image'
+          native-image-job-reports: 'true'
+          cache: 'gradle'
 
-      - name: Setup Gradle
+      - name: Setup Gradle with enhanced caching
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
           cache-read-only: false
+          cache-cleanup: on-success
+          gradle-home-cache-cleanup: true
 
-      # Removed the manual Gradle cache - gradle-build-action handles this better
+      # Cache native image compilation artifacts
+      - name: Cache GraalVM native image artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2/files-2.1
+            ~/.gradle/wrapper
+            ./metrics/build/native/nativeCompile
+            ./metrics/.gradle
+          key: ${{ runner.os }}-graalvm-native-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-graalvm-native-
+            ${{ runner.os }}-gradle-
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -83,7 +100,6 @@ jobs:
           IMAGE_TAG="${BRANCH_NAME}-${SHORT_SHA}"
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
-      # Enhanced Docker layer caching
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
@@ -99,31 +115,66 @@ jobs:
           driver-opts: |
             network=host
 
-      - name: Native Compile
-        working-directory: ./metrics
-        run: ./gradlew nativeCompile
-        env:
-          GRADLE_OPTS: "-Xmx8g"
-
-      # Pre-configure buildpacks for better performance
-      - name: Build and push with bootBuildImage
+      # Optimized Native Compile with better configuration
+      - name: Native Compile (Optimized)
         working-directory: ./metrics
         run: |
-          ./gradlew bootBuildImage -x test -x nativeCompile\
+          # Pre-configure JVM options for optimal native compilation
+          export JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx10g -XX:+UseStringDeduplication"
+          
+          # Run native compilation with optimized settings
+          ./gradlew nativeCompile \
+            --no-daemon \
+            --parallel \
+            --build-cache \
+            --configuration-cache \
+            -Pspring.aot.enabled=true \
+            -Dorg.gradle.jvmargs="-Xmx10g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC"
+        env:
+          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC -Dorg.gradle.daemon=false"
+          GRAALVM_HOME: ${{ steps.setup-graalvm.outputs.graalvm-home }}
+          # Native image specific optimizations
+          NATIVE_IMAGE_OPTS: >-
+            --no-fallback
+            -J-Xmx5g
+            -J-XX:+UseG1GC
+            -H:+ReportExceptionStackTraces
+            --enable-preview
+            --parallelism=4
+            -H:+AllowVMInspection
+            -H:+UnlockExperimentalVMOptions
+            -H:+UseCompressedOops
+            -H:+UseCGroupMemoryLimitForHeap
+            -H:ConfigurationFileDirectories=src/main/resources/META-INF/native-image/
+            --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j
+            --initialize-at-build-time=org.springframework
+            -H:ReflectionConfigurationFiles=reflect-config.json
+            -H:ResourceConfigurationFiles=resource-config.json
+            --trace-class-initialization=org.springframework
+
+      - name: Build and push with bootBuildImage (Skip native compile)
+        working-directory: ./metrics
+        run: |
+          ./gradlew bootBuildImage \
+            -x test \
+            -x nativeCompile \
+            --no-daemon \
+            --parallel \
+            --build-cache \
             --imageName=${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} \
             --publishImage
         env:
           DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKER_BUILDKIT: 1
-          # Buildpack optimizations
+          # Optimized buildpack configuration
           BP_JVM_VERSION: "24"
-          BPL_JVM_HEAD_ROOM: "5"
+          BPL_JVM_HEAD_ROOM: "10"
           BP_NATIVE_IMAGE: "true"
-          BP_NATIVE_IMAGE_BUILD_ARGUMENTS: "--no-fallback -J-Xmx8g -H:+ReportExceptionStackTraces --enable-preview --parallelism=3 -H:+AllowVMInspection --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j"
-          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel -Pspring.aot.enabled=true"
-          MAVEN_OPTS: "-Xmx8g"
-          GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=1g"
+          BP_NATIVE_IMAGE_BUILD_ARGUMENTS: "--no-fallback -J-Xmx5g -J-XX:+UseG1GC -H:+ReportExceptionStackTraces --enable-preview --parallelism=3 -H:+AllowVMInspection -H:+UnlockExperimentalVMOptions --initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter,ch.qos.logback.classic.spi.LogbackServiceProvider,ch.qos.logback,org.slf4j --initialize-at-build-time=org.springframework"
+          BP_GRADLE_BUILD_ARGUMENTS: "--no-daemon --parallel --build-cache --configuration-cache -Pspring.aot.enabled=true"
+          MAVEN_OPTS: "-Xmx5g"
+          GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC"
 
       - name: Tag and push latest
         if: github.ref == 'refs/heads/master'

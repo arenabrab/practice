@@ -67,30 +67,28 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-graalvmNative {
-    binaries {
-        main {
-            buildArgs.addAll([
-                    '--no-fallback',
-                    '--enable-preview',
-                    '-J-Xmx8g',
-                    '--parallelism=4',
-                    '--gc=G1',
-                    '--initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter',
-                    '--initialize-at-run-time=ch.qos.logback',
-                    '--initialize-at-run-time=org.slf4j'
-            ])
-        }
-    }
-}
+//graalvmNative {
+//    binaries {
+//        main {
+//            buildArgs.addAll([
+//                    '--no-fallback',
+//                    '--enable-preview',
+//                    '-J-Xmx8g',
+//                    '--initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter',
+//                    '--initialize-at-run-time=ch.qos.logback',
+//                    '--initialize-at-run-time=org.slf4j'
+//            ])
+//        }
+//    }
+//}
 
-tasks.named('bootBuildImage') {
-    builder = "paketobuildpacks/builder-jammy-tiny:latest"
-    environment = [
-            "BP_NATIVE_IMAGE": "true",
-            "BP_JVM_VERSION": "24"
-    ]
-}
+//tasks.named('bootBuildImage') {
+//    builder = "paketobuildpacks/builder-jammy-tiny:latest"
+//    environment = [
+//            "BP_NATIVE_IMAGE": "true",
+//            "BP_JVM_VERSION": "24"
+//    ]
+//}
 
 tasks.named('bootJar') {
     layered {

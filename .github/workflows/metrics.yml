@@ -129,7 +129,7 @@ jobs:
             -Dorg.gradle.jvmargs="-Xmx10g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC"
         env:
           GRADLE_OPTS: "-Xmx5g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC -Dorg.gradle.daemon=false"
-          GRAALVM_HOME: ${{ steps.setup-graalvm.outputs.graalvm-home }}
+#          GRAALVM_HOME: ${{ steps.setup-graalvm.outputs.graalvm-home }}
           # Native image specific optimizations
           NATIVE_IMAGE_OPTS: >-
             --no-fallback

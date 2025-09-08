@@ -76,10 +76,9 @@ graalvmNative {
                     '-J-Xmx8g',
                     '--parallelism=4',
                     '--gc=G1',
-                    '--initialize-at-build-time=org.slf4j',
                     '--initialize-at-run-time=ch.qos.logback.classic.util.LogbackMDCAdapter',
-                    '--initialize-at-run-time=ch.qos.logback.classic.Logger',
-                    '--initialize-at-run-time=ch.qos.logback.core.util.StatusPrinter'
+                    '--initialize-at-run-time=ch.qos.logback',
+                    '--initialize-at-run-time=org.slf4j'
             ])
         }
     }

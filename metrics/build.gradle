@@ -83,7 +83,7 @@ graalvmNative {
 }
 
 tasks.named('bootBuildImage') {
-    builder = "paketobuildpacks/builder-jammy-base:latest"
+    builder = "paketobuildpacks/builder-jammy-tiny:latest"
     environment = [
             "BP_NATIVE_IMAGE": "true",
             "BP_JVM_VERSION": "24"

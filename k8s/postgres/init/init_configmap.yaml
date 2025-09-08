@@ -8,7 +8,7 @@ data:
 
     CREATE TABLE metric
     (
-        id                 SERIAL PRIMARY KEY,
+        id                 BIGSERIAL PRIMARY KEY,
         type               VARCHAR(255) NOT NULL,
         payload            JSONB        NOT NULL,
         created_date       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),

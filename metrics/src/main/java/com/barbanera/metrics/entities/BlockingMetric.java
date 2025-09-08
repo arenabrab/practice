@@ -23,13 +23,13 @@ import java.time.Instant;
 public class BlockingMetric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     private String type;
     @JdbcTypeCode(value = SqlTypes.JSON)
     private String payload;
     @Version
     @Builder.Default
-    private Long version = 1L;
+    private int version = 1;
     @CreatedDate
     private Instant createdDate;
     @LastModifiedDate

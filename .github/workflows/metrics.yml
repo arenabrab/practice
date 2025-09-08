@@ -57,14 +57,13 @@ jobs:
           java-version: '24'
           distribution: 'graalvm'
           native-image-job-reports: 'true'
-          cache: 'gradle'
+#          cache: 'gradle'
 
       - name: Setup Gradle with enhanced caching
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
           cache-read-only: false
-          cache-cleanup: on-success
           gradle-home-cache-cleanup: true
 
       # Cache native image compilation artifacts

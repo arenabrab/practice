@@ -122,7 +122,6 @@ jobs:
           
           # Run native compilation with optimized settings
           ./gradlew nativeCompile \
-#            --no-configuration-cache \
             --no-daemon \
             --parallel \
             --build-cache \

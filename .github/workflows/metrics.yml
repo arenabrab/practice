@@ -26,7 +26,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
-          cache-read-only: false
+          cache-read-only: false  # Added this for better caching
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -34,10 +34,10 @@ jobs:
 
       - name: Run tests
         working-directory: ./metrics
-        run: ./gradlew test
+        run: ./gradlew test  # Removed 'clean' - unnecessary and slows down
 
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores  # Use larger runner for GraalVM native builds
     if: github.ref == 'refs/heads/master'
     outputs:
       image-tag: ${{ steps.image-tag.outputs.tag }}
@@ -56,15 +56,7 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
-#      - name: Cache Gradle dependencies
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            ~/.gradle/caches
-#            ~/.gradle/wrapper
-#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gradle-
+      # Removed the manual Gradle cache - gradle-build-action handles this better
 
       - name: Make gradlew executable
         working-directory: ./metrics
@@ -84,13 +76,14 @@ jobs:
           IMAGE_TAG="${BRANCH_NAME}-${SHORT_SHA}"
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
+      # Enhanced Docker layer caching
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key:  ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/build.gradle*') }}
+          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/build.gradle*') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-docker-buildx-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -99,10 +92,17 @@ jobs:
           driver-opts: |
             network=host
 
+      - name: Native Compile
+        working-directory: ./metrics
+        run: ./gradlew nativeCompile
+        env:
+          GRADLE_OPTS: "-Xmx8g"
+
+      # Pre-configure buildpacks for better performance
       - name: Build and push with bootBuildImage
         working-directory: ./metrics
         run: |
-          ./gradlew bootBuildImage -x test \
+          ./gradlew bootBuildImage -x test -x nativeCompile\
             --imageName=${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} \
             --publishImage
         env:
@@ -119,8 +119,6 @@ jobs:
         run: |
           docker tag ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:latest
-
-
 
   update-gitops:
     needs: build-and-push
@@ -149,5 +147,3 @@ jobs:
           git add .
           git commit -m "Update image tag to ${{ needs.build-and-push.outputs.image-tag }}" || exit 0
           git push
-        env:
-          NEW_TAG: ${{ needs.build-and-push.outputs.image-tag }}

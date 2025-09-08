@@ -127,7 +127,6 @@ jobs:
             --no-daemon \
             --parallel \
             --build-cache \
-            --configuration-cache \
             -Pspring.aot.enabled=true \
             -Dorg.gradle.jvmargs="-Xmx10g -XX:MaxMetaspaceSize=2g -XX:+UseG1GC"
         env:

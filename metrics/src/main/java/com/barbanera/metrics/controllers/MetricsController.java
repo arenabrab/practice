@@ -4,11 +4,13 @@ import com.barbanera.metrics.dtos.MetricDto;
 import com.barbanera.metrics.entities.BlockingMetric;
 import com.barbanera.metrics.services.BlockingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("metrics/blocking")
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class MetricsController {
     @PostMapping
     @ResponseStatus(code = org.springframework.http.HttpStatus.CREATED)
     public BlockingMetric postMetric(@RequestBody MetricDto metric) {
+        log.info("Receiving BLOCKING metric {}", metric);
         return blockingService.saveMetric(metric.toBlockingMetric());
     }
 

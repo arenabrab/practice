@@ -1,5 +1,6 @@
 package com.barbanera.metrics.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -15,7 +16,7 @@ public record ReactiveMetric(
         @Id
         Long id,
         String type,
-        String payload,
+        JsonNode payload,
         @Version
         int version,
         @CreatedDate

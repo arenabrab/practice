@@ -7,6 +7,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.Instant;
+
 @Builder(toBuilder = true)
 @Table(name = "metric")
 public record ReactiveMetric(
@@ -15,8 +17,8 @@ public record ReactiveMetric(
         String type,
         String payload,
         @Version
-        long version,
+        int version,
         @CreatedDate
-        Long createdDate,
+        Instant createdDate,
         @LastModifiedDate
-        Long lastModifiedDate) {}
+        Instant lastModifiedDate) {}

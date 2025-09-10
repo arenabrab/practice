@@ -22,11 +22,12 @@ public record MetricDto(
                 .build();
     }
 
+    @SneakyThrows
     public ReactiveMetric toReactiveMetric() {
         return ReactiveMetric.builder()
                 .id(this.id)
                 .type(this.type)
-                .payload(this.payload)
+                .payload(mapper.writeValueAsString(this.payload))
                 .build();
     }
 }

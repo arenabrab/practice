@@ -7,7 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @Builder(toBuilder = true)
 @Table(name = "metric")
@@ -19,6 +19,6 @@ public record ReactiveMetric(
         @Version
         int version,
         @CreatedDate
-        Instant createdDate,
+        OffsetDateTime createdDate,
         @LastModifiedDate
-        Instant lastModifiedDate) {}
+        OffsetDateTime lastModifiedDate) {}

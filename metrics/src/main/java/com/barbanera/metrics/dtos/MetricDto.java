@@ -4,6 +4,7 @@ import com.barbanera.metrics.entities.BlockingMetric;
 import com.barbanera.metrics.entities.ReactiveMetric;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.r2dbc.postgresql.codec.Json;
 import lombok.SneakyThrows;
 
 public record MetricDto(
@@ -28,7 +29,7 @@ public record MetricDto(
         return ReactiveMetric.builder()
                 .id(this.id)
                 .type(this.type)
-                .payload(this.payload)
+                .payload(Json.of(mapper.writeValueAsString(this.payload)))
                 .build();
     }
 }
